@@ -1,0 +1,20 @@
+#----------------------------------------------------------------------------
+# Ignore these files when commiting to a git repository.
+#
+# See http://help.github.com/ignore-files/ for more about ignoring files.
+#
+#----------------------------------------------------------------------------
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# Distribution / packaging
+venv/
+
+# MacOs
+.DS_Store
+
+
+# Config file
+conf.json
