@@ -18,3 +18,18 @@
     source [envname]/bin/activate
 
     ```
+- Rename `sample_cong.json` to `conf.json`, and fill all the required info
+- To install. Run:
+    ```
+    ./install.sh
+    ```
+- To run telegram bot. Run:
+    ```
+    ./activate
+    ```
+
+## Future Plan
+***
+- Make all skill into object with `base_skill` with access checking as parent class
+- Add `/dict` for dictionary
+- Add `/lyric` for lyrics using Genius API

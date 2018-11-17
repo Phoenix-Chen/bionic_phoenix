@@ -1,0 +1,7 @@
+{
+    "telegram": "your telegram token",
+    "spellcheck": "your spellcheck api key",
+    "white_list": [
+        # Your telegram ID here as integer
+    ]
+}
