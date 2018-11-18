@@ -18,7 +18,7 @@
     source [envname]/bin/activate
 
     ```
-- Rename `sample_cong.json` to `conf.json`, and fill all the required info
+- Rename `sample_conf.json` to `conf.json`, and fill all the required info
 - To install. Run:
     ```
     ./install.sh
@@ -32,4 +32,4 @@
 ***
 - Make all skill into object with `base_skill` with access checking as parent class
 - Add `/dict` for dictionary
-- Add `/lyric` for lyrics using Genius API
+- Add `/lyrics` for lyrics using Genius API

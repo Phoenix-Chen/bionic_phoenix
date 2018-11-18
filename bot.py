@@ -12,6 +12,7 @@ import logging
 from skills.term import term_handler
 from skills.conversation import conversation_handler
 from skills.spell import spell_handler
+from skills.lyrics import lyrics_handler
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -46,6 +47,7 @@ class Bot:
         #self.dp.add_handler(CommandHandler("term", partial(self.check_access, func=term)))
         self.dp.add_handler(term_handler(self.conf))
         self.dp.add_handler(spell_handler(self.conf))
+        self.dp.add_handler(lyrics_handler(self.conf))
 
         # on noncommand
         self.dp.add_handler(conversation_handler(self.conf))
