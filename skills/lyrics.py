@@ -1,9 +1,10 @@
 from urllib import request
 import simplejson as json
 from .utils import has_access
-from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove)
-from telegram.ext import CommandHandler, ConversationHandler, Filters, MessageHandler
+from telegram import (InlineKeyboardButton, InlineKeyboardMarkup)
+from telegram.ext import CommandHandler, ConversationHandler, CallbackQueryHandler
 from functools import partial
+from bs4 import BeautifulSoup
 
 SONG = 0
 
@@ -22,10 +23,10 @@ def lyrics(bot, update, args, conf):
             response = json.loads(request.urlopen(url).read())
             if response['meta']['status'] == 200:
                 hits = response['response']['hits']
-                reply_keyboard = [[song['result']['full_title']] for song in hits]
+                reply_keyboard = [[InlineKeyboardButton(song['result']['full_title'], callback_data=str(song['result']['id']))] for song in hits]
                 update.message.reply_text(
                     'Select the song you want.',
-                    reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
+                    reply_markup=InlineKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
                 )
                 return SONG
             else:
@@ -37,20 +38,46 @@ def lyrics(bot, update, args, conf):
     return ConversationHandler.END
 
 def song(bot, update, conf):
-    if has_access(update, conf):
-        pass
+    query = update.callback_query
+    song_id = query.data
+    api_url = 'https://api.genius.com/songs/' + song_id + '?access_token=' + conf['genius']['access_token']
+    headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.153 Safari/537.36'}
+    try:
+        response = json.loads(request.urlopen(api_url).read())
+        if response['meta']['status'] == 200:
+            url = response['response']['song']['url']
+            req = request.Request(url, headers=headers)
+            soup = BeautifulSoup(request.urlopen(req).read(), 'html.parser')
+            lyrics = soup.find("div", {"class" : "lyrics"}).text
+            bot.edit_message_text(
+                chat_id=query.message.chat_id,
+                message_id=query.message.message_id,
+                text=lyrics
+            )
+        else:
+            bot.edit_message_text(
+                chat_id=query.message.chat_id,
+                message_id=query.message.message_id,
+                text="Failed to request Genius API"
+            )
+    except Exception as e:
+        bot.edit_message_text(
+            chat_id=query.message.chat_id,
+            message_id=query.message.message_id,
+            text="Something went wrong when requesting Genius API: " + str(e)
+        )
     return ConversationHandler.END
 
 def exit(bot, update, conf):
     if has_access(update, conf):
-        update.message.reply_text('Exit Lyrics Mode...', reply_markup=ReplyKeyboardRemove())
+        update.message.reply_text('Exit Lyrics Mode...')
     return ConversationHandler.END
 
 def lyrics_handler(conf):
     handler = ConversationHandler(
             entry_points=[CommandHandler('lyrics', partial(lyrics, conf=conf), pass_args=True)],
             states={
-                SONG: [MessageHandler(Filters.text, partial(song, conf=conf))]
+                SONG: [CallbackQueryHandler(partial(song, conf=conf))]
             },
             fallbacks=[CommandHandler('exit', partial(exit, conf=conf))]
     )

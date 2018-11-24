@@ -1,2 +1,3 @@
 python-telegram-bot
 simplejson
+beautifulsoup4
