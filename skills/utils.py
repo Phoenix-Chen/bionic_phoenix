@@ -1,3 +1,4 @@
+WORD_LIMIT = 4096
 
 def has_access(update, conf):
     """

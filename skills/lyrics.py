@@ -1,6 +1,6 @@
 from urllib import request
 import simplejson as json
-from .utils import has_access
+from .utils import has_access, WORD_LIMIT
 from telegram import (InlineKeyboardButton, InlineKeyboardMarkup)
 from telegram.ext import CommandHandler, ConversationHandler, CallbackQueryHandler
 from functools import partial
@@ -49,11 +49,20 @@ def song(bot, update, conf):
             req = request.Request(url, headers=headers)
             soup = BeautifulSoup(request.urlopen(req).read(), 'html.parser')
             lyrics = soup.find("div", {"class" : "lyrics"}).text
-            bot.edit_message_text(
-                chat_id=query.message.chat_id,
-                message_id=query.message.message_id,
-                text=lyrics
-            )
+            offset = 0
+            while offset < len(lyrics):
+                if offset == 0:
+                    bot.edit_message_text(
+                        chat_id=query.message.chat_id,
+                        message_id=query.message.message_id,
+                        text=lyrics[offset:offset + WORD_LIMIT]
+                    )
+                else:
+                    bot.send_message(
+                        chat_id=query.message.chat_id,
+                        text=lyrics[offset:offset + WORD_LIMIT]
+                    )
+                offset += WORD_LIMIT
         else:
             bot.edit_message_text(
                 chat_id=query.message.chat_id,
