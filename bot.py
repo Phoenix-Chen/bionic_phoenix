@@ -5,14 +5,17 @@ import sys
 import argparse
 from functools import partial
 
-from telegram.ext import Updater, CommandHandler, ConversationHandler, Filters, MessageHandler
-import simplejson as json
 import logging
+import simplejson as json
+from telegram.ext import Updater, CommandHandler, ConversationHandler, Filters, MessageHandler
 
 from skills.term import term_handler
 from skills.conversation import conversation_handler
 from skills.spell import spell_handler
 from skills.lyrics import lyrics_handler
+from skills.tele import tele_handler
+
+from service.utils import start_service
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -26,7 +29,7 @@ def help(bot, update):
 
 
 def error(bot, update, error):
-    """Log Errors caused by Updates."""
+    """Log Errors caused by Upda."""
     logger.warning('Update "%s" caused error "%s"', update, error)
 
 
@@ -44,10 +47,10 @@ class Bot:
 
         # on different commands - answer in Telegram
         #self.dp.add_handler(CommandHandler("help", partial(self.check_access, func=help)))
-        #self.dp.add_handler(CommandHandler("term", partial(self.check_access, func=term)))
         self.dp.add_handler(term_handler(self.conf))
         self.dp.add_handler(spell_handler(self.conf))
         self.dp.add_handler(lyrics_handler(self.conf))
+        self.dp.add_handler(tele_handler(self.conf))
 
         # on noncommand
         self.dp.add_handler(conversation_handler(self.conf))
@@ -59,6 +62,9 @@ class Bot:
         """
             Run bot.
         """
+        # Start BionicPhoenixService
+        start_service(self.conf['telegram'], self.conf['white_list'][0])
+
         # Start the Bot
         self.updater.start_polling()
 
@@ -92,5 +98,5 @@ if __name__ == '__main__':
     try:
         main()
     except KeyboardInterrupt:
-        print >> sys.stderr, '\nExiting by user request.\n'
+        print('\nExiting by user request.\n', file=sys.stderr)
         sys.exit(0)
