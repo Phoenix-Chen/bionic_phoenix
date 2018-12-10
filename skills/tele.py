@@ -5,22 +5,24 @@
 from .utils import has_access
 from telegram.ext import CommandHandler
 from functools import partial
+from service.utils import make_interface
 
-def get_status(bot, update):
-    #if has_access(update, conf):
-    update.message.reply_text("Get_status")
+def get_status(bot, update, args, conf):
+    if has_access(update, conf):
+        iface = make_interface()
+        # If no argument passed show all current status
+        if len(args) == 0:
+            statuses = iface.get_processes()
+            s = "PID\tSTART_TIME\tCOMMAND\tSTATUS\n" + "\n".join(statuses)
+            update.message.reply_text(s)
+            return
+        if len(args) == 1 and args[0] == "clean":
+            statuses = iface.clean()
+            s = "PID\tSTART_TIME\tCOMMAND\tSTATUS\n" + "\n".join(statuses)
+            update.message.reply_text(s)
+            return
+
 
 def tele_handler(conf):
-    # p = subprocess.Popen(["python", "./bionic_phoenix_service.py"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    # out, err = p.communicate()
-    # result = p.returncode
-    # p = Process(target=make_tele, args=(conf))
-    # p.start()
-    # p.join()
-    #tele = Tele(conf)
-    #b.start_service()
-    #tele = Tele(conf)
-
-
-    handler = CommandHandler("tele", get_status)
+    handler = CommandHandler("tele", partial(get_status, conf=conf), pass_args=True)
     return handler

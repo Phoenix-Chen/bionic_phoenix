@@ -4,11 +4,14 @@ import dbus.service
 import dbus.mainloop.glib
 from gi.repository import GLib
 from telegram import Bot
+from service.bionic_phoenix_process import BionicPhoenixProcess, STATUS
 
 class BionicPhoenixService(dbus.service.Object):
     def __init__(self, telegram_token, chat_id):
         self.telegram_token = telegram_token
         self.chat_id = chat_id
+        self.processes = dict()
+
         dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
 
         session_bus = dbus.SessionBus()
@@ -19,23 +22,32 @@ class BionicPhoenixService(dbus.service.Object):
         print("Running com.bionic.PhoenixService")
         self.mainloop.run()
 
-    # @dbus.service.method("com.bionic.PhoenixInterface", in_signature='s', out_signature='as')
-    # def HelloWorld(self, hello_message):
-    #     print (str(hello_message))
-    #     return ["Hello", " from example-service.py", "with unique name"]
-    #
-    # @dbus.service.method("com.bionic.PhoenixInterface", in_signature='', out_signature='(ss)')
-    # def GetTuple(self):
-    #     return ("Hello Tuple", " from example-service.py")
-    #
-    # @dbus.service.method("com.bionic.PhoenixInterface", in_signature='', out_signature='a{ss}')
-    # def GetDict(self):
-    #     return {"first": "Hello Dict", "second": " from example-service.py"}
+    @dbus.service.method("com.bionic.PhoenixInterface", in_signature='is', out_signature='')
+    def add_process(self, pid, command):
+        self.processes[pid] = BionicPhoenixProcess(pid, command)
 
-    @dbus.service.method("com.bionic.PhoenixInterface", in_signature='', out_signature='')
-    def push_message(self, status):
+    @dbus.service.method("com.bionic.PhoenixInterface", in_signature='ii', out_signature='')
+    def update_process(self, pid, status):
+        self.processes[pid].update(int(status))
         bot = Bot(self.telegram_token)
-        bot.send_message(self.chat_id, "what")
+        bot.send_message(self.chat_id, self.processes[pid].to_string())
+
+    @dbus.service.method("com.bionic.PhoenixInterface", in_signature='', out_signature='as')
+    def get_processes(self):
+        l = list()
+        for ps in self.processes.values():
+            l.append(ps.to_string())
+        return l
+
+    @dbus.service.method("com.bionic.PhoenixInterface", in_signature='', out_signature='as')
+    def clean(self):
+        """
+            Delete processes that are already finished running
+        """
+        for pid in list(self.processes.keys()):
+            if self.processes[pid].status != STATUS.RUNNING:
+                del self.processes[pid]
+        return self.get_processes()
 
     @dbus.service.method("com.bionic.PhoenixInterface", in_signature='s', out_signature='')
     def set_token(self, telegram_token):

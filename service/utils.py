@@ -1,18 +1,23 @@
 import sys
-import threading
 from service.bionic_phoenix_service import BionicPhoenixService
 import dbus
+from multiprocessing import Process
 
 def start_service(telegram_token=None, chat_id=None):
-    thread = threading.Thread(target=BionicPhoenixService, args=(telegram_token, chat_id))
-    thread.setDaemon(True)
-    thread.start()
+    """
+    Start BionicPhoenixService from a seperate process
+    """
+    # Use multiprocessing instead of threading
+    # Since accessing the interface (in skills.tele)
+    # seem to cause some problem if using the same pid
+    p = Process(target=BionicPhoenixService, args=(telegram_token, chat_id))
+    p.start()
 
 def make_interface():
     bus = dbus.SessionBus()
     try:
         remote_object = bus.get_object("com.bionic.PhoenixService", "/Tele")
-        print(remote_object.Introspect(dbus_interface="org.freedesktop.DBus.Introspectable"))
+        # print(remote_object.Introspect(dbus_interface="org.freedesktop.DBus.Introspectable"))
         iface = dbus.Interface(remote_object, "com.bionic.PhoenixInterface")
         return iface
     except dbus.DBusException as dbe:
