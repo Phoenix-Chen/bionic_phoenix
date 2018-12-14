@@ -5,6 +5,7 @@ import dbus.mainloop.glib
 from gi.repository import GLib
 from telegram import Bot
 from service.bionic_phoenix_process import BionicPhoenixProcess, STATUS
+import subprocess
 
 class BionicPhoenixService(dbus.service.Object):
     def __init__(self, telegram_token, chat_id):
@@ -31,6 +32,11 @@ class BionicPhoenixService(dbus.service.Object):
         self.processes[pid].update(int(status))
         bot = Bot(self.telegram_token)
         bot.send_message(self.chat_id, self.processes[pid].to_string())
+
+    @dbus.service.method("com.bionic.PhoenixInterface", in_signature='i', out_signature='s')
+    def terminate_process(self, pid):
+        stdout = subprocess.getoutput("kill -9 " + str(pid))
+        return stdout
 
     @dbus.service.method("com.bionic.PhoenixInterface", in_signature='', out_signature='as')
     def get_processes(self):

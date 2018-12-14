@@ -2,7 +2,7 @@
     This skill is a bit different than the others
     as it might not be triggered by the user input
 """
-from .utils import has_access
+from .utils import has_access, is_int
 from telegram.ext import CommandHandler
 from functools import partial
 from service.utils import make_interface
@@ -20,6 +20,13 @@ def get_status(bot, update, args, conf):
             statuses = iface.clean()
             s = "PID\tSTART_TIME\tCOMMAND\tSTATUS\n" + "\n".join(statuses)
             update.message.reply_text(s)
+            return
+        if len(args) == 2 and args[0] == "kill":
+            if is_int(args[1]):
+                output = iface.terminate_process(int(args[1]))
+                update.message.reply_text(output)
+            else:
+                update.message.reply_text("PID must be integer.")
             return
 
 
