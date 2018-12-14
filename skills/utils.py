@@ -10,3 +10,10 @@ def has_access(update, conf):
         update.message.reply_text("You don't have access to me yet.")
         return False
     return True
+
+def is_int(s):
+    try:
+        int(s)
+        return True
+    except ValueError:
+        return False
