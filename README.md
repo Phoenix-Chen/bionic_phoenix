@@ -24,6 +24,20 @@
     ```
     ./install.sh
     ```
+- To setup D-Bus. Run:
+    ```
+    dbus-launch
+    ```
+  The output should look like:
+    ```
+    DBUS_SESSION_BUS_ADDRESS=unix:abstract=/tmp/dbus-WnoEdNDMmB,guid=[GUID]
+    DBUS_SESSION_BUS_PID=[PID]
+    ```
+  Then run:
+    ```
+    export DBUS_SESSION_BUS_ADDRESS=unix:abstract=/tmp/dbus-WnoEdNDMmB,guid=[GUID]
+    export DBUS_SESSION_BUS_PID=[PID]
+    ```
 - To run telegram bot. Run:
     ```
     ./activate
