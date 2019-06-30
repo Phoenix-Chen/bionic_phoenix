@@ -7,25 +7,23 @@ from functools import partial
 
 COMMAND = 0
 
+@has_access
 def term(bot, update, conf):
-    if has_access(update, conf):
-        cwd = os.getcwd()
-        update.message.reply_text('Terminal Mode:\n Bionic_Phoenix$ ')
-        return COMMAND
-    return ConversationHandler.END
+    cwd = os.getcwd()
+    update.message.reply_text('Terminal Mode:\n Bionic_Phoenix$ ')
+    return COMMAND
 
+@has_access
 def command(bot, update, conf):
-    if has_access(update, conf):
-        command = update.message.text
-        cwd = os.getcwd()
-        stdout = subprocess.getoutput(command)
-        update.message.reply_text("Bionic_Phoenix$ " + command + '\n' + stdout)
-        return COMMAND
-    return ConversationHandler.END
+    command = update.message.text
+    cwd = os.getcwd()
+    stdout = subprocess.getoutput(command)
+    update.message.reply_text("Bionic_Phoenix$ " + command + '\n' + stdout)
+    return COMMAND
 
+@has_access
 def exit(bot, update, conf):
-    if has_access(update, conf):
-        update.message.reply_text('Exit Terminal Mode...')
+    update.message.reply_text('Exit Terminal Mode...')
     return ConversationHandler.END
 
 def term_handler(conf):

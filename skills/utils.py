@@ -1,15 +1,25 @@
+from functools import wraps
+from telegram.ext import ConversationHandler
+
 WORD_LIMIT = 4096
 
-def has_access(update, conf):
+def has_access(func):
     """
         this function checks whether user has access
     """
-    user = update.message.from_user
-    id = int(user['id'])
-    if id not in conf["white_list"]:
-        update.message.reply_text("You don't have access to me yet.")
-        return False
-    return True
+    @wraps(func)
+    def _wrapper(bot, update, conf, *args, **kwargs):
+        try:
+            user = update.message.from_user
+            id = int(user['id'])
+            if id in conf["white_list"]:
+                return func(bot, update, conf=conf, *args, **kwargs)
+            update.message.reply_text("You don't have access to me yet.")
+        except Exception as e:
+            update.message.reply_text("Error occur in has_access: " + str(e))
+        return ConversationHandler.END
+    return _wrapper
+
 
 def is_int(s):
     try:
