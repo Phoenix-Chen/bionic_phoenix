@@ -14,6 +14,7 @@ from skills.conversation import conversation_handler
 from skills.spell import spell_handler
 from skills.lyrics import lyrics_handler
 from skills.tele import tele_handler
+from skills.utils import has_access
 
 from service.utils import start_service
 
@@ -23,13 +24,22 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 
 logger = logging.getLogger(__name__)
 
+@has_access
+def help(bot, update, conf):
+    """Send a message when the command /help is issued."""
+    update.message.reply_text((
+        "/term   Enter terminal mode connected to server.\n"
+        "/tele [--clean] [--kill PID]   Check scripts status run with tele.\n"
+        "/lyrics [KEYWORDS]   Search lyrics based on keywords.\n"
+        "/spell [KEYWORD]   Spell check and return possible corrections."
+    ))
 
-def help(bot, update):
-    update.message.reply_text("Nice try...")
-
+def help_handler(conf):
+    handler = CommandHandler("help", partial(help, conf=conf))
+    return handler
 
 def error(bot, update, error):
-    """Log Errors caused by Upda."""
+    """Log Errors caused by Updates."""
     logger.warning('Update "%s" caused error "%s"', update, error)
 
 
@@ -42,11 +52,8 @@ class Bot:
         self.set_skills()
 
     def set_skills(self):
-
-        #self.dp.add_handler(ConversationHandler(entry_points=[CommandHandler("start", self.check_access)], states={}, fallbacks=[]))
-
         # on different commands - answer in Telegram
-        #self.dp.add_handler(CommandHandler("help", partial(self.check_access, func=help)))
+        self.dp.add_handler(help_handler(self.conf))
         self.dp.add_handler(term_handler(self.conf))
         self.dp.add_handler(spell_handler(self.conf))
         self.dp.add_handler(lyrics_handler(self.conf))
