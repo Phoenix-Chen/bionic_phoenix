@@ -2,3 +2,4 @@ python-telegram-bot
 simplejson
 beautifulsoup4
 dbus-python
+SQLAlchemy

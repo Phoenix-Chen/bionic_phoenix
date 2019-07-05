@@ -16,6 +16,7 @@ from skills.lyrics import lyrics_handler
 from skills.tele import tele_handler
 from skills.utils import has_access
 
+from database.utils import setup_db
 from service.utils import start_service
 
 # Enable logging
@@ -49,6 +50,11 @@ class Bot:
         self.updater = Updater(conf['telegram'])
         # Get the dispatcher to register handlers
         self.dp = self.updater.dispatcher
+
+        # Set up databases
+        setup_db(conf['databases'])
+
+        # Set up skills
         self.set_skills()
 
     def set_skills(self):
