@@ -1,4 +1,3 @@
-import os
 import subprocess
 from telegram.ext import CommandHandler, ConversationHandler, Filters, MessageHandler
 from .utils import has_access
@@ -9,14 +8,12 @@ COMMAND = 0
 
 @has_access
 def term(bot, update, conf):
-    cwd = os.getcwd()
     update.message.reply_text('Terminal Mode:\n Bionic_Phoenix$ ')
     return COMMAND
 
 @has_access
 def command(bot, update, conf):
     command = update.message.text
-    cwd = os.getcwd()
     stdout = subprocess.getoutput(command)
     update.message.reply_text("Bionic_Phoenix$ " + command + '\n' + stdout)
     return COMMAND

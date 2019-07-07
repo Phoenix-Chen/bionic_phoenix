@@ -3,3 +3,4 @@ simplejson
 beautifulsoup4
 dbus-python
 SQLAlchemy
+emoji

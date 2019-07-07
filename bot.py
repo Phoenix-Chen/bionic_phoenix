@@ -9,12 +9,7 @@ import logging
 import simplejson as json
 from telegram.ext import Updater, CommandHandler, ConversationHandler, Filters, MessageHandler
 
-from skills.term import term_handler
-from skills.conversation import conversation_handler
-from skills.spell import spell_handler
-from skills.lyrics import lyrics_handler
-from skills.tele import tele_handler
-from skills.utils import has_access
+from skills import *
 
 from database.utils import setup_db
 from service.utils import start_service
@@ -64,6 +59,7 @@ class Bot:
         self.dp.add_handler(spell_handler(self.conf))
         self.dp.add_handler(lyrics_handler(self.conf))
         self.dp.add_handler(tele_handler(self.conf))
+        self.dp.add_handler(vocab_handler(self.conf))
 
         # on noncommand
         self.dp.add_handler(conversation_handler(self.conf))
