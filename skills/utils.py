@@ -27,3 +27,12 @@ def is_int(s):
         return True
     except ValueError:
         return False
+
+
+def is_word(s):
+    if s == '' or s == None:
+        return False
+    for c in s:
+        if not c.isalpha():
+            return False
+    return True

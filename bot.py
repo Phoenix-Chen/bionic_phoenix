@@ -9,13 +9,9 @@ import logging
 import simplejson as json
 from telegram.ext import Updater, CommandHandler, ConversationHandler, Filters, MessageHandler
 
-from skills.term import term_handler
-from skills.conversation import conversation_handler
-from skills.spell import spell_handler
-from skills.lyrics import lyrics_handler
-from skills.tele import tele_handler
-from skills.utils import has_access
+from skills import *
 
+from database.utils import setup_db
 from service.utils import start_service
 
 # Enable logging
@@ -31,6 +27,7 @@ def help(bot, update, conf):
         "/term   Enter terminal mode connected to server.\n"
         "/tele [--clean] [--kill PID]   Check scripts status run with tele.\n"
         "/lyrics [KEYWORDS]   Search lyrics based on keywords.\n"
+        "/vocab   Vocabulary mode with dictionary and flash cards.\n"
         "/spell [KEYWORD]   Spell check and return possible corrections."
     ))
 
@@ -49,6 +46,11 @@ class Bot:
         self.updater = Updater(conf['telegram'])
         # Get the dispatcher to register handlers
         self.dp = self.updater.dispatcher
+
+        # Set up databases
+        setup_db(conf['databases'])
+
+        # Set up skills
         self.set_skills()
 
     def set_skills(self):
@@ -58,6 +60,7 @@ class Bot:
         self.dp.add_handler(spell_handler(self.conf))
         self.dp.add_handler(lyrics_handler(self.conf))
         self.dp.add_handler(tele_handler(self.conf))
+        self.dp.add_handler(vocab_handler(self.conf))
 
         # on noncommand
         self.dp.add_handler(conversation_handler(self.conf))
