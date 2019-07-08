@@ -2,8 +2,8 @@
 ***
 Bionic Phoenix is a Telegram bot assistant with various skills. Including a terminal mode that remotely connects to server, a skill that checks/manages processes status on server, and more.
 
-![term screenshot](https://github.com/Phoenix-Chen/bionic_phoenix/blob/vocab/term_screenshot.png)
-![tele screenshot](https://github.com/Phoenix-Chen/bionic_phoenix/blob/vocab/tele_screenshot.png)
+![term screenshot](https://github.com/Phoenix-Chen/bionic_phoenix/blob/master/term_screenshot.png)
+![tele screenshot](https://github.com/Phoenix-Chen/bionic_phoenix/blob/master/tele_screenshot.png)
 
 ## Requirements
 ***
