@@ -27,6 +27,7 @@ def help(bot, update, conf):
         "/term   Enter terminal mode connected to server.\n"
         "/tele [--clean] [--kill PID]   Check scripts status run with tele.\n"
         "/lyrics [KEYWORDS]   Search lyrics based on keywords.\n"
+        "/vocab   Vocabulary mode with dictionary and flash cards.\n"
         "/spell [KEYWORD]   Spell check and return possible corrections."
     ))
 

@@ -1,7 +1,14 @@
 {
     "telegram": "your telegram token",
     "spellcheck": "your spellcheck api key",
+    "genius": {
+        "access_token": "your genius access toekn"
+    },
+    "merriam_webster": "your merriam webster api key",
     "white_list": [
         # Your telegram ID here as integer
+    ],
+    "databases": [
+        "vocab"
     ]
 }
