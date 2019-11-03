@@ -20,3 +20,6 @@ conf.json
 
 # DB files
 *.db
+
+# Local downloads
+downloads/

@@ -7,19 +7,19 @@ from functools import partial
 COMMAND = 0
 
 @has_access
-def term(bot, update, conf):
+def term(update, context, conf):
     update.message.reply_text('Terminal Mode:\n Bionic_Phoenix$ ')
     return COMMAND
 
 @has_access
-def command(bot, update, conf):
+def command(update, context, conf):
     command = update.message.text
     stdout = subprocess.getoutput(command)
     update.message.reply_text("Bionic_Phoenix$ " + command + '\n' + stdout)
     return COMMAND
 
 @has_access
-def exit(bot, update, conf):
+def exit(update, context, conf):
     update.message.reply_text('Exit Terminal Mode...')
     return ConversationHandler.END
 

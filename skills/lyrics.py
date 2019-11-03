@@ -9,16 +9,16 @@ from bs4 import BeautifulSoup
 SONG = 0
 
 @has_access
-def lyrics(bot, update, args, conf):
+def lyrics(update, context, conf):
     """
         Use Genius API to find songs according to input
         Currently using pre-generated access token
         More than willing to switch to OAuth2 once figure out how
     """
-    if len(args) == 0:
+    if len(context.args) == 0:
         update.message.reply_text('/lyrics takes at least 1 argument')
         return ConversationHandler.END
-    url = 'https://api.genius.com/search?q=' + '%20'.join(args) + '&access_token=' + conf['genius']['access_token']
+    url = 'https://api.genius.com/search?q=' + '%20'.join(context.args) + '&access_token=' + conf['genius']['access_token']
     try:
         response = json.loads(request.urlopen(url).read())
         if response['meta']['status'] == 200:
@@ -36,7 +36,7 @@ def lyrics(bot, update, args, conf):
         update.message.reply_text("Something went wrong when requesting Genius API: " + str(e))
         return ConversationHandler.END
 
-def song(bot, update, conf):
+def song(update, context, conf):
     query = update.callback_query
     song_id = query.data
     api_url = 'https://api.genius.com/songs/' + song_id + '?access_token=' + conf['genius']['access_token']
@@ -51,25 +51,25 @@ def song(bot, update, conf):
             offset = 0
             while offset < len(lyrics):
                 if offset == 0:
-                    bot.edit_message_text(
+                    context.bot.edit_message_text(
                         chat_id=query.message.chat_id,
                         message_id=query.message.message_id,
                         text=lyrics[offset:offset + WORD_LIMIT]
                     )
                 else:
-                    bot.send_message(
+                    context.bot.send_message(
                         chat_id=query.message.chat_id,
                         text=lyrics[offset:offset + WORD_LIMIT]
                     )
                 offset += WORD_LIMIT
         else:
-            bot.edit_message_text(
+            context.bot.edit_message_text(
                 chat_id=query.message.chat_id,
                 message_id=query.message.message_id,
                 text="Failed to request Genius API"
             )
     except Exception as e:
-        bot.edit_message_text(
+        context.bot.edit_message_text(
             chat_id=query.message.chat_id,
             message_id=query.message.message_id,
             text="Something went wrong when requesting Genius API: " + str(e)
@@ -77,13 +77,13 @@ def song(bot, update, conf):
     return ConversationHandler.END
 
 @has_access
-def exit(bot, update, conf):
+def exit(update, context, conf):
     update.message.reply_text('Exit Lyrics Mode...')
     return ConversationHandler.END
 
 def lyrics_handler(conf):
     handler = ConversationHandler(
-            entry_points=[CommandHandler('lyrics', partial(lyrics, conf=conf), pass_args=True)],
+            entry_points=[CommandHandler('lyrics', partial(lyrics, conf=conf))],
             states={
                 SONG: [CallbackQueryHandler(partial(song, conf=conf))]
             },

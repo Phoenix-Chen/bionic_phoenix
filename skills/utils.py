@@ -1,3 +1,5 @@
+import sys
+import traceback
 from functools import wraps
 from telegram.ext import ConversationHandler
 
@@ -8,15 +10,18 @@ def has_access(func):
         this function checks whether user has access
     """
     @wraps(func)
-    def _wrapper(bot, update, conf, *args, **kwargs):
+    def _wrapper(update, context, conf, *args, **kwargs):
         try:
             user = update.message.from_user
             id = int(user['id'])
             if id in conf["white_list"]:
-                return func(bot, update, conf=conf, *args, **kwargs)
+                return func(update, context, conf, *args, **kwargs)
             update.message.reply_text("You don't have access to me yet.")
         except Exception as e:
-            update.message.reply_text("Error occur in has_access: " + str(e))
+            et, ei, tb = sys.exc_info()
+            stack = traceback.extract_tb(tb)
+            (filename, line, procname, text) = stack[-1]
+            update.message.reply_text('Error occurs in ' + procname + ': ' + type(e).__name__ + ": " + str(e))
         return ConversationHandler.END
     return _wrapper
 

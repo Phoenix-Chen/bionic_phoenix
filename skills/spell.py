@@ -5,27 +5,27 @@ import simplejson as json
 from urllib import request
 
 @has_access
-def spell(bot, update, args, conf):
+def spell(update, context, conf):
     """
         Use Spellcheck API: https://market.mashape.com/montanaflynn/spellcheck
     """
-    if len(args) == 0:
+    if len(context.args) == 0:
         update.message.reply_text('/spell takes at least 1 argument')
     else:
         headers={
             "X-Mashape-Key": conf['spellcheck'],
             "Accept": "application/json"
         }
-        url = 'https://montanaflynn-spellcheck.p.mashape.com/check/?text=' + '+'.join(args)
+        url = 'https://montanaflynn-spellcheck.p.mashape.com/check/?text=' + '+'.join(context.args)
         req = request.Request(url, headers=headers)
         response = json.loads(request.urlopen(req).read())
         # Recommand top 10 if input is single word
         # Recommand correction if input is not single word
-        if len(args) == 1:
+        if len(context.args) == 1:
             update.message.reply_text('\n'.join(response['corrections'][response['original']][:10]))
         else:
             update.message.reply_text(response["suggestion"])
 
 def spell_handler(conf):
-    handler = CommandHandler("spell", partial(spell, conf=conf), pass_args=True)
+    handler = CommandHandler("spell", partial(spell, conf=conf))
     return handler

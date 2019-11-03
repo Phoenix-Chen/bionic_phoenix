@@ -16,12 +16,12 @@ from service.utils import start_service
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    level=logging.INFO)
+                    level=logging.DEBUG)
 
 logger = logging.getLogger(__name__)
 
 @has_access
-def help(bot, update, conf):
+def help(update, context, conf):
     """Send a message when the command /help is issued."""
     update.message.reply_text((
         "/term   Enter terminal mode connected to server.\n"
@@ -35,15 +35,15 @@ def help_handler(conf):
     handler = CommandHandler("help", partial(help, conf=conf))
     return handler
 
-def error(bot, update, error):
+def error(update, context):
     """Log Errors caused by Updates."""
-    logger.warning('Update "%s" caused error "%s"', update, error)
+    logger.warning('Update "%s" caused error "%s"', update, context.error)
 
 
 class Bot:
     def __init__(self, conf):
         self.conf = conf
-        self.updater = Updater(conf['telegram'])
+        self.updater = Updater(conf['telegram'], use_context=True)
         # Get the dispatcher to register handlers
         self.dp = self.updater.dispatcher
 
@@ -63,7 +63,8 @@ class Bot:
         self.dp.add_handler(vocab_handler(self.conf))
 
         # on noncommand
-        self.dp.add_handler(conversation_handler(self.conf))
+        self.dp.add_handler(convo_handler(self.conf))
+        self.dp.add_handler(file_handler(self.conf))
 
         # log all errors
         self.dp.add_error_handler(error)

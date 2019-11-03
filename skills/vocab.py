@@ -56,7 +56,7 @@ class FlashCards:
 _flash_cards = None
 
 @has_access
-def vocab(bot, update, conf):
+def vocab(update, context, conf):
     global _flash_cards
     _flash_cards = FlashCards()
     reply_keyboard = [
@@ -70,28 +70,28 @@ def vocab(bot, update, conf):
     return _ENTRY_POINTS
 
 
-def entry_points(bot, update, conf):
+def entry_points(update, context, conf):
     global _flash_cards
     query = update.callback_query
     option = int(query.data)
     if option == _DICT:
-        bot.edit_message_text(
+        context.bot.edit_message_text(
             chat_id=query.message.chat_id,
             message_id=query.message.message_id,
             text='Input the word you want to look up:'
         )
     elif option == _ADD_CARD:
-        return add_card(bot, query)
+        return add_card(context.bot, query)
     elif option == _GET_CARD:
-        return get_card(bot, query)
+        return get_card(context.bot, query)
     elif option == _SHOW_DEF:
-        return show_def(bot, query, conf)
+        return show_def(context.bot, query, conf)
     elif option == _ADD_CORRECT:
         _flash_cards.add_correct()
-        return get_card(bot, query)
+        return get_card(context.bot, query)
     elif option == ConversationHandler.END:
         _flash_cards.destory()
-        bot.edit_message_text(
+        context.bot.edit_message_text(
             chat_id=query.message.chat_id,
             message_id=query.message.message_id,
             text='Exit Vocab Mode...'
@@ -118,7 +118,7 @@ def merriam_webster(keyword, api_key) -> str:
     return result
 
 
-def dictionary(bot, update, conf):
+def dictionary(update, context, conf):
     word = update.message.text
     if not is_word(word):
         update.message.reply_text('Please input a valid word:')
@@ -216,7 +216,7 @@ def show_def(bot, query, conf):
 
 
 @has_access
-def exit(bot, update, conf):
+def exit(update, context, conf):
     global _flash_cards
     _flash_cards.destory()
     update.message.reply_text('Exit Vocab Mode...')
