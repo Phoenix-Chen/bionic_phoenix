@@ -23,11 +23,3 @@ def make_interface():
     except dbus.DBusException as dbe:
         print(dbe)
         sys.exit(1)
-
-def set_service(telegram_token, chat_id):
-    """
-        Set Telegram token and chat_id for BionicPhoenixService
-    """
-    iface = make_interface()
-    iface.set_token(telegram_token)
-    iface.set_chat_id(chat_id)
